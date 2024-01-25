@@ -1,6 +1,6 @@
 <?php
 
-namespace App\GeojsonConverter;
+namespace Lraveri\GeojsonConverter;
 
 interface GeojsonConverterInterface {
     public function convert(): string;

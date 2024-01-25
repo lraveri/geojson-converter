@@ -1,8 +1,8 @@
 <?php
 
-namespace App\GeojsonConverter;
+namespace Lraveri\GeojsonConverter;
 
-use App\GeojsonConverter\Exception\InvalidXmlException;
+use Lraveri\GeojsonConverter\Exception\InvalidXmlException;
 
 class KmlConverter implements GeojsonConverterInterface
 {
