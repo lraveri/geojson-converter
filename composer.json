@@ -1,0 +1,14 @@
+{
+    "name": "lraveri/geojson-converter",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Luca Raveri",
+            "email": "lucaraveri993@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^7.1||^8.0"
+    }
+}
