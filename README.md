@@ -17,7 +17,7 @@ composer require lraveri/geojson-converter
 To convert a GPX file to GeoJSON:
 
 ```php
-`$content = file_get_contents('/path/to/file.gpx');
+$content = file_get_contents('/path/to/file.gpx');
 $gpxConverter = new GpxConverter($content);
 $geoJson = $gpxConverter->convert();` 
 ```
@@ -27,7 +27,7 @@ $geoJson = $gpxConverter->convert();`
 To convert a KML file to GeoJSON:
 
 ```php
-`$content = file_get_contents('/path/to/file.kml');
+$content = file_get_contents('/path/to/file.kml');
 $kmlConverter = new KmlConverter($content);
 $geoJson = $kmlConverter->convert();` 
 ```
