@@ -1,4 +1,4 @@
-# GeoJSON Converter
+# Convert KML and GPX to GeoJSON in PHP
 
 ## Description
 `geojson-converter` is a PHP library for converting GPX and KML files into GeoJSON format. This library is particularly useful for projects that require a quick and reliable conversion of mapping file formats.
