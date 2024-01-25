@@ -7,7 +7,7 @@
 To install `geojson-converter`, use the following command in your project:
 
 ```bash
-composer require lraveri/geojson-converter`` 
+composer require lraveri/geojson-converter
 ```
 
 ## Usage
