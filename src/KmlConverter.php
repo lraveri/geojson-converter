@@ -20,8 +20,16 @@ class KmlConverter implements GeojsonConverterInterface
             throw new InvalidXmlException("Error parsing the KML file.");
         }
 
+        //importante: se il documeto KML non ha un namespace, il metodo xpath non funziona correttamente
+        // Verifica se il documento KML ha un namespace
+        $namespaces = $xml->getNamespaces(true);
+
+        //Registra il namespace KML se esiste in modo che funzioni l'xpath
+        $xml->registerXPathNamespace('kml', reset($namespaces));
+        $placemarks = $xml->xpath('//kml:Placemark'); // FUNZIONA
+
         $features = [];
-        foreach ($xml->Document->Placemark as $placemark) {
+        foreach ($placemarks as $placemark) {
             $features[] = $this->parsePlacemark($placemark);
         }
 
@@ -61,25 +69,7 @@ class KmlConverter implements GeojsonConverterInterface
 
         // Gestione LineString
         if (isset($placemark->LineString)) {
-            $coordinatesList = explode(' ', trim((string) $placemark->LineString->coordinates));
-            $coordinates = [];
-            foreach ($coordinatesList as $coord) {
-                $c = trim($coord);
-                if (empty($c)) {
-                    continue; // Salta le coordinate vuote
-                }
-                if (strpos($c, ',') === false) {
-                    continue; // Salta se non contiene una virgola
-                }
-                $parts = explode(',', $c);
-                if (count($parts) < 2) {
-                    continue; // Salta se non ha almeno due parti
-                }
-                if (!is_numeric($parts[0]) || !is_numeric($parts[1])) {
-                    continue; // Salta se le parti non sono numeriche
-                }
-                $coordinates[] = array_map('floatval', $parts);
-            }
+            $coordinates = $this->parseLineStringCoordinates($placemark->LineString);
 
             return [
                 'type' => 'LineString',
@@ -110,9 +100,25 @@ class KmlConverter implements GeojsonConverterInterface
     protected function parseLineStringCoordinates($lineString): array
     {
         $coordinatesList = explode(' ', trim((string) $lineString->coordinates));
-        return array_map(function ($coord) {
-            $parts = explode(',', trim($coord));
-            return array_map('floatval', $parts);
-        }, $coordinatesList);
+        $coordinates = [];
+        foreach ($coordinatesList as $coord) {
+            $c = trim($coord);
+            if (empty($c)) {
+                continue; // Salta le coordinate vuote
+            }
+            if (strpos($c, ',') === false) {
+                continue; // Salta se non contiene una virgola
+            }
+            $parts = explode(',', $c);
+            if (count($parts) < 2) {
+                continue; // Salta se non ha almeno due parti
+            }
+            if (!is_numeric($parts[0]) || !is_numeric($parts[1])) {
+                continue; // Salta se le parti non sono numeriche
+            }
+            $coordinates[] = array_map('floatval', $parts);
+        }
+
+        return $coordinates;
     }
 }
