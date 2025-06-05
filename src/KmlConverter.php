@@ -20,13 +20,10 @@ class KmlConverter implements GeojsonConverterInterface
             throw new InvalidXmlException("Error parsing the KML file.");
         }
 
-        //importante: se il documeto KML non ha un namespace, il metodo xpath non funziona correttamente
-        // Verifica se il documento KML ha un namespace
         $namespaces = $xml->getNamespaces(true);
 
-        //Registra il namespace KML se esiste in modo che funzioni l'xpath
         $xml->registerXPathNamespace('kml', reset($namespaces));
-        $placemarks = $xml->xpath('//kml:Placemark'); // FUNZIONA
+        $placemarks = $xml->xpath('//kml:Placemark');
 
         $features = [];
         foreach ($placemarks as $placemark) {
@@ -46,7 +43,6 @@ class KmlConverter implements GeojsonConverterInterface
         $properties = [
             'name' => (string) $placemark->name,
             'description' => (string) $placemark->description,
-            // Estrai ulteriori informazioni, come timestamp o ExtendedData se necessario
         ];
 
         return [
@@ -58,7 +54,6 @@ class KmlConverter implements GeojsonConverterInterface
 
     protected function parseGeometry($placemark): array
     {
-        // Gestione Point
         if (isset($placemark->Point)) {
             $coordinates = explode(',', trim((string) $placemark->Point->coordinates));
             return [
@@ -67,7 +62,6 @@ class KmlConverter implements GeojsonConverterInterface
             ];
         }
 
-        // Gestione LineString
         if (isset($placemark->LineString)) {
             $coordinates = $this->parseLineStringCoordinates($placemark->LineString);
 
@@ -77,7 +71,6 @@ class KmlConverter implements GeojsonConverterInterface
             ];
         }
 
-        // Gestione MultiGeometry
         if (isset($placemark->MultiGeometry)) {
             $multiLineCoordinates = [];
             foreach ($placemark->MultiGeometry->children() as $childGeometry) {
@@ -104,17 +97,17 @@ class KmlConverter implements GeojsonConverterInterface
         foreach ($coordinatesList as $coord) {
             $c = trim($coord);
             if (empty($c)) {
-                continue; // Salta le coordinate vuote
+                continue;
             }
             if (strpos($c, ',') === false) {
-                continue; // Salta se non contiene una virgola
+                continue;
             }
             $parts = explode(',', $c);
             if (count($parts) < 2) {
-                continue; // Salta se non ha almeno due parti
+                continue;
             }
             if (!is_numeric($parts[0]) || !is_numeric($parts[1])) {
-                continue; // Salta se le parti non sono numeriche
+                continue;
             }
             $coordinates[] = array_map('floatval', $parts);
         }

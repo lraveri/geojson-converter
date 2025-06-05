@@ -114,6 +114,87 @@ class KmlConverterTest extends TestCase
         $method->setAccessible(true);
         $converter = new KmlConverter('');
         $result = $method->invoke($converter, (object)["coordinates" => ""]);
-        $this->assertEquals([[0.0]], $result);
+        $this->assertEquals([], $result);
+    }
+
+    public function testParseLineStringCoordinatesHandlesEmptyString()
+    {
+        $reflection = new \ReflectionClass(KmlConverter::class);
+        $method = $reflection->getMethod('parseLineStringCoordinates');
+        $method->setAccessible(true);
+        $converter = new KmlConverter('');
+        $result = $method->invoke($converter, (object)["coordinates" => ""]);
+        $this->assertEquals([], $result);
+    }
+
+    public function testParseLineStringCoordinatesHandlesSinglePoint()
+    {
+        $reflection = new \ReflectionClass(KmlConverter::class);
+        $method = $reflection->getMethod('parseLineStringCoordinates');
+        $method->setAccessible(true);
+        $converter = new KmlConverter('');
+        $result = $method->invoke($converter, (object)["coordinates" => "9.0,45.0,100.0"]);
+        $this->assertEquals([[9.0, 45.0, 100.0]], $result);
+    }
+
+    public function testParseLineStringCoordinatesHandlesMultiplePoints()
+    {
+        $reflection = new \ReflectionClass(KmlConverter::class);
+        $method = $reflection->getMethod('parseLineStringCoordinates');
+        $method->setAccessible(true);
+        $converter = new KmlConverter('');
+        $result = $method->invoke($converter, (object)["coordinates" => "9.0,45.0,100.0 9.1,45.1,110.0"]);
+        $this->assertEquals([[9.0, 45.0, 100.0], [9.1, 45.1, 110.0]], $result);
+    }
+
+    public function testParseLineStringCoordinatesSkipsInvalidPoints()
+    {
+        $reflection = new \ReflectionClass(KmlConverter::class);
+        $method = $reflection->getMethod('parseLineStringCoordinates');
+        $method->setAccessible(true);
+        $converter = new KmlConverter('');
+        $result = $method->invoke($converter, (object)["coordinates" => "9.0,45.0,100.0 invalid 9.1,45.1,110.0 , ,"]);
+        $this->assertEquals([[9.0, 45.0, 100.0], [9.1, 45.1, 110.0]], $result);
+    }
+
+    public function testParseLineStringCoordinatesHandlesNoComma()
+    {
+        $reflection = new \ReflectionClass(KmlConverter::class);
+        $method = $reflection->getMethod('parseLineStringCoordinates');
+        $method->setAccessible(true);
+        $converter = new KmlConverter('');
+        $result = $method->invoke($converter, (object)["coordinates" => "9.0 45.0 100.0"]);
+        $this->assertEquals([], $result);
+    }
+
+    public function testParseLineStringCoordinatesHandlesLessThanTwoParts()
+    {
+        $reflection = new \ReflectionClass(KmlConverter::class);
+        $method = $reflection->getMethod('parseLineStringCoordinates');
+        $method->setAccessible(true);
+        $converter = new KmlConverter('');
+        // Only one part, should be skipped
+        $result = $method->invoke($converter, (object)["coordinates" => "9.0"]);
+        $this->assertEquals([], $result);
+        // One valid, one invalid
+        $result = $method->invoke($converter, (object)["coordinates" => "9.0,45.0,100.0 9.1"]);
+        $this->assertEquals([[9.0, 45.0, 100.0]], $result);
+    }
+
+    public function testParseLineStringCoordinatesSkipsSingleValueAndMixedCases()
+    {
+        $reflection = new \ReflectionClass(KmlConverter::class);
+        $method = $reflection->getMethod('parseLineStringCoordinates');
+        $method->setAccessible(true);
+        $converter = new KmlConverter('');
+        // Only a single value, should be skipped
+        $result = $method->invoke($converter, (object)["coordinates" => "9.0"]);
+        $this->assertEquals([], $result);
+        // Mixed: one valid, one with only one part
+        $result = $method->invoke($converter, (object)["coordinates" => "9.0,45.0,100.0 9.1"]);
+        $this->assertEquals([[9.0, 45.0, 100.0]], $result);
+        // Mixed: one valid, one empty, one with only one part
+        $result = $method->invoke($converter, (object)["coordinates" => "9.0,45.0,100.0   9.1   "]);
+        $this->assertEquals([[9.0, 45.0, 100.0]], $result);
     }
 }

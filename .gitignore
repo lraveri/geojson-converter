@@ -8,3 +8,4 @@ vendor/autoload.php
 .coverage.xml
 tests.txt
 composer.lock
+results
