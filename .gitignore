@@ -1,1 +1,10 @@
 .DS_Store
+.phpunit.result.cache
+.phpunit.cache/
+vendor/
+.vscode/
+.tests-results/
+vendor/autoload.php
+.coverage.xml
+tests.txt
+composer.lock
